@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ display_name }}さんのプロフィール{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h1>{{ display_name }}（@{{ username }}）の<br>プロフィール</h1>
+
+
+    {% if profile_image %}
+        <img class="profile" src="{{ url_for('static', filename='uploads/' + profile_image) }}" alt="プロフィール画像">
+    {% endif %}
+
+    <p><strong>自己紹介：</strong> {{ bio }}</p>
+
+    <!-- フォロー/解除ボタン（自分以外のユーザーにのみ表示） -->
+    {% if session['user_id'] != user_id %}
+        {% if is_following %}
+            <form method="post" action="{{ url_for('unfollow', user_id=user_id) }}">
+                <button type="submit">フォロー解除</button>
+            </form>
+        {% else %}
+            <form method="post" action="{{ url_for('follow', user_id=user_id) }}">
+                <button type="submit">フォローする</button>
+            </form>
+        {% endif %}
+
+        <!-- ✅ DMボタン追加 -->
+        <a href="{{ url_for('message', receiver_id=user_id) }}" class="dm-button">このユーザーにDMを送る</a>
+    {% endif %}
+
+    <!-- フォロー数・フォロワー数 -->
+    <div class="follow-stats">
+        <p>フォロー中：{{ following }}人</p>
+        <p>フォロワー：{{ followers }}人</p>
+    </div>
+
+    <h2>投稿一覧</h2>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post">
+                {% if post['image'] %}
+                    <img src="{{ url_for('static', filename='uploads/' + post['image']) }}" alt="投稿画像">
+                {% endif %}
+                <p>{{ post['content'] }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>投稿がまだありません。</p>
+    {% endif %}
+</div>
+
+<style>
+    .dm-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 15px;
+        background-color: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .dm-button:hover {
+        background-color: #218838;
+    }
+</style>
+{% endblock %}

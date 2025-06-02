@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}プロフィール{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+
+    .profile-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    img.profile {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-bottom: 20px;
+    }
+
+    a {
+        display: inline-block;
+        margin: 10px 10px 0 0;
+        color: #007BFF;
+        text-decoration: none;
+    }
+
+    .post {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 15px;
+        background-color: #fdfdfd;
+    }
+
+    .post img {
+        width: 100%;
+        max-width: 300px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="profile-container">
+    <h1>{{ display_name }}（@{{ username }}）の<br>プロフィール</h1>
+
+    {% if profile_image %}
+        <img class="profile" src="{{ url_for('static', filename='uploads/' + profile_image) }}" alt="プロフィール画像">
+    {% else %}
+        <p>プロフィール画像が設定されていません。</p>
+    {% endif %}
+
+    <p><strong>ユーザー名:</strong> {{ display_name }}</p>
+    <p><strong>自己紹介：</strong> {{ bio }}</p>
+
+    <div class="follow-stats">
+        <p>フォロー中：{{ following }}人　フォロワー：{{ followers }}人</p>
+    </div>
+
+    <!-- リンク集 -->
+    <a href="{{ url_for('edit_profile') }}">プロフィールを編集</a>
+    <a href="{{ url_for('create_post') }}">新規投稿</a>
+    <br>
+    <a href="{{ url_for('inbox') }}">📩 メッセージ受信箱</a>
+    <a href="{{ url_for('timeline') }}">タイムラインへ</a>
+    <br>
+    <a href="{{ url_for('notifications') }}">🔔 通知</a>
+
+    <h2>あなたの投稿一覧</h2>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post">
+                {% if post['image'] %}
+                    <img src="{{ url_for('static', filename='uploads/' + post['image']) }}" alt="投稿画像"><br>
+                {% endif %}
+                <p>{{ post['content'] }}</p>
+
+                <form method="POST" action="{{ url_for('delete_post', post_id=post['id']) }}" onsubmit="return confirm('本当に削除しますか？');">
+                    <button type="submit" style="background-color:red;color:white;padding:5px 10px;border:none;border-radius:5px;">削除</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>投稿がまだありません。</p>
+    {% endif %}
+</div>
+{% endblock %}

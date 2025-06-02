@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        form {
+            display: inline-block;
+            border: 1px solid #ccc;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        input {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 250px;
+        }
+        .message {
+            color: red;
+            margin-top: 10px;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+    </style>
+
+    <h2>ログイン</h2>
+    <form method="POST" action="{{ url_for('login') }}">
+        <input type="email" name="email" placeholder="メールアドレス" required>
+        <input type="password" name="password" placeholder="パスワード" required>
+        <input type="submit" value="ログイン">
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="message">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <p>アカウントをお持ちでない方は <a href="{{ url_for('register') }}">新規登録</a></p>
+{% endblock %}

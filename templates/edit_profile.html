@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}プロフィール編集{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+
+    .form-container input,
+    .form-container textarea {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    .form-container button {
+        background-color: #007BFF;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .form-container button:hover {
+        background-color: #0056b3;
+    }
+
+    .form-container img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="form-container">
+    <h2>プロフィール編集</h2>
+
+    {% if user[0] %}
+        <img src="{{ url_for('static', filename='uploads/' ~ user[0]) }}" alt="プロフィール画像">
+    {% else %}
+        <p>画像なし</p>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+
+   <label>ユーザー名（表示名）</label>
+  <input type="text" name="display_name" value="{{ user['display_name'] }}" required><br>
+
+  <label>ユーザーID（@から始まる）</label>
+  <input type="text" name="username" value="{{ user['username'] }}" required><br>
+
+ 
+  <label>自己紹介</label>
+  <textarea name="bio" rows="4">{{ user['bio'] }}</textarea><br>
+
+  <label>プロフィール画像</label>
+  <input type="file" name="profile_image"><br>
+
+    <button type="submit">保存</button>
+</form>
+
+</div>
+{% endblock %}

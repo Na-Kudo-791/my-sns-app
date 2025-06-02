@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>受信箱</h2>
+{% if conversations %}
+<ul>
+  {% for convo in conversations %}
+    <li>
+      <a href="{{ url_for('message', receiver_id=convo.user_id) }}">
+        {{ convo.display_name }}（@{{ convo.username }}）
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>まだやり取りのあるユーザーがいません。</p>
+{% endif %}
+{% endblock %}
