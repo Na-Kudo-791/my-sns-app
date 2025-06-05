@@ -360,33 +360,42 @@ def comment(post_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    # コメント内容の取得と空チェック
+    # フォームからコメントのテキスト内容 ('comment') を取得
     content = request.form['comment']
+     # コメントが空だった場合、エラーメッセージを表示し、元のページに戻す
     if not content:
         flash('コメントが空です。')
         return redirect(request.referrer)
 
+    # ログイン中のユーザー情報を取得
     user_id = session['user_id']
     username = session.get('username')  # 通知用にユーザー名を取得
 
+    # データベース接続の確立
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # コメントを保存
+     # コメントをデータベースに保存
+    # 'comments' テーブルに、コメントが紐づく投稿ID、コメントしたユーザーID、コメント内容を挿入
     cursor.execute(
         "INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)",
         (post_id, user_id, content)
     )
 
     # 投稿の作成者を取得
+     # コメントされた投稿の作者のuser_idを取得(通知を送る相手を特定するため)
     post_author = cursor.execute(
         "SELECT user_id FROM posts WHERE id = ?",
         (post_id,)
     ).fetchone()
 
+    # 投稿の作者が存在する場合、通知を処理
     if post_author:
         post_author_id = post_author['user_id']
 
         # 自分の投稿でなければ通知を追加
+        # コメントしたユーザーが投稿の作者自身ではない場合、かつユーザー名がセッションにあれば通知を作成
         if post_author_id != user_id and username:
             message = f"{username}さんがあなたの投稿にコメントしました。"
             cursor.execute(
@@ -404,32 +413,40 @@ def follow(user_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+     # フォローする側のユーザーIDとユーザー名を取得
     follower_id = session['user_id']
     follower_name = session.get('username')  # 通知用にユーザー名を取得
 
+     # 自分自身をフォローしようとした場合のチェック
+    # フォローする側とされる側が同じIDの場合、エラーメッセージを表示しリダイレクト
     if follower_id == user_id:
         flash("自分自身をフォローすることはできません。")
         return redirect(request.referrer)
 
+    # データベース接続の確立
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # フォロー済みかチェック
+     # 'follows' テーブルに、既にこのフォロー関係が登録されているかを確認
     exists = cursor.execute(
         "SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?",
         (follower_id, user_id)
     ).fetchone()
 
     if exists:
+        # 既にフォローしている場合、エラーメッセージを表示
         flash("すでにフォローしています。")
     else:
-        # フォローを登録
+         # フォローをデータベースに登録
+        # 'follows' テーブルに、フォローしたユーザーIDとフォローされたユーザーIDを挿入
         cursor.execute(
             "INSERT INTO follows (follower_id, followed_id) VALUES (?, ?)",
             (follower_id, user_id)
         )
 
         # 通知を作成（自分自身でなければ）
+        # フォローしたユーザーのユーザー名が存在する場合、フォローされたユーザーに通知を作成
         if follower_name:
             message = f"{follower_name}さんがあなたをフォローしました。"
             cursor.execute(
@@ -437,8 +454,8 @@ def follow(user_id):
                 (user_id, message)
             )
 
-        conn.commit()
-        flash("フォローしました。")
+        conn.commit()# データベースへの変更を確定（フォローと通知の保存）
+        flash("フォローしました。")# 成功メッセージを表示
 
     conn.close()
     return redirect(request.referrer)
@@ -449,11 +466,15 @@ def unfollow(user_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    # フォロー関係をデータベースから削除
+    # 'follows' テーブルから、ログイン中のユーザーが指定されたuser_idのユーザーをフォローしているレコードを削除
     conn = get_db_connection()
     conn.execute("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?", (session['user_id'], user_id))
-    conn.commit()
+    
+    conn.commit()# データベースへの変更を確定
     conn.close()
-    flash("フォローを解除しました。")
+    
+    flash("フォローを解除しました。")# 解除完了メッセージの表示
     return redirect(request.referrer)
 
 
@@ -463,23 +484,36 @@ def like(post_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    # データベース接続の確立とカーソルの取得
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # 既に「いいね」済みかチェック
+    # 現在ログインしているユーザーが、指定された投稿に既に「いいね」をしているかを確認
     liked = cursor.execute("SELECT 1 FROM likes WHERE user_id = ? AND post_id = ?", (session['user_id'], post_id)).fetchone()
 
+    # まだ「いいね」していない場合のみ処理を実行
     if not liked:
+        # 「いいね」をデータベースに登録
+        # 'likes' テーブルに、いいねしたユーザーIDと投稿IDを挿入
         cursor.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", (session['user_id'], post_id))
-
+        # 投稿の作成者を取得
+        # いいねされた投稿の作者のuser_idを取得(これは通知を送る相手を特定するため)
         post_author = cursor.execute("SELECT user_id FROM posts WHERE id = ?", (post_id,)).fetchone()
+
+        # 投稿の作者が存在し、かつ「いいね」したのが自分自身ではない場合、通知を作成
         if post_author:
             post_author_id = post_author['user_id']
+            # 「いいね」したユーザーが投稿の作者自身ではない場合
             if post_author_id != session['user_id']:
-                username = session.get('username', '誰か')  # ← 安全に取得
+                # 通知メッセージに使用するユーザー名を取得します。
+                # session.get('username', '誰か') は、usernameがセッションにない場合に「誰か」というデフォルト値を設定する
+                username = session.get('username', '誰か')  
                 message = f"{username}さんがあなたの投稿にいいねしました。"
+                # 'notifications' テーブルに通知を挿入します。
                 cursor.execute("INSERT INTO notifications (user_id, message) VALUES (?, ?)", (post_author_id, message))
 
-        conn.commit()
+        conn.commit()# データベースへの変更を確定
 
     conn.close()
     return redirect(request.referrer)
@@ -492,12 +526,14 @@ def unlike(post_id):
         return redirect(url_for('login'))
 
     conn = get_db_connection()
+    # 「いいね」をデータベースから削除
+    # 'likes' テーブルから、ログイン中のユーザーが指定された投稿に登録した「いいね」レコードを削除
     conn.execute("DELETE FROM likes WHERE user_id = ? AND post_id = ?", (session['user_id'], post_id))
-    conn.commit()
+    conn.commit() # データベースへの変更を確定
     conn.close()
     return redirect(request.referrer)
 
-#DM送信画面
+#DM送受信画面
 @app.route('/message/<int:receiver_id>', methods=['GET', 'POST'])
 def message(receiver_id):
     if 'user_id' not in session:
@@ -505,15 +541,24 @@ def message(receiver_id):
 
     conn = get_db_connection()
 
+    # HTTPリクエストがPOSTメソッドの場合（メッセージが送信された時）
     if request.method == 'POST':
+        # フォームからメッセージ内容を取得
         content = request.form['content']
+        # 送信者（現在ログイン中のユーザー）のIDを取得
+        
         sender_id = session['user_id']
+        # メッセージをデータベースに挿入
+        # 'messages' テーブルに、送信者ID、受信者ID、メッセージ内容を保存
         conn.execute("INSERT INTO messages (sender_id, receiver_id, content) VALUES (?, ?, ?)",
                      (sender_id, receiver_id, content))
-        conn.commit()
-        flash("メッセージを送信しました。")
+        conn.commit()# データベースへの変更を確定
+        flash("メッセージを送信しました。")# 成功メッセージを表示
 
     # 送受信メッセージ取得
+    # 送受信メッセージ取得
+    # 現在ログインしているユーザー（user_id）と、DMの相手（receiver_id）との間の全てのメッセージを取得します。
+    # sender_id が自分 AND receiver_id が相手、またはその逆のメッセージを、作成された順に並べて取得します。
     user_id = session['user_id']
     messages = conn.execute('''
         SELECT * FROM messages
@@ -522,10 +567,15 @@ def message(receiver_id):
         ORDER BY created_at
     ''', (user_id, receiver_id, receiver_id, user_id)).fetchall()
 
+     # DM相手のユーザー情報を取得
+    # メッセージの相手のプロフィール情報（例: ユーザー名、表示名など）をデータベースから取得
     receiver = conn.execute("SELECT * FROM users WHERE user_id = ?", (receiver_id,)).fetchone()
     conn.close()
 
+    # メッセージ画面のテンプレートをレンダリング
+    # 取得したメッセージ履歴とDM相手の情報を 'message.html' テンプレートに渡して表示
     return render_template('message.html', messages=messages, receiver=receiver)
+
 
 #DM受信画面
 @app.route('/inbox')
@@ -533,11 +583,14 @@ def inbox():
     if 'user_id' not in session:
         return redirect('/login')
 
+    # ログイン中のユーザーIDを取得
     user_id = session['user_id']
     conn = get_db_connection()
     c = conn.cursor()
 
-    # 自分宛・自分発のやり取りで、自分→自分以外を対象に、相手のID一覧を取得
+    # DMのやり取りをした相手のユーザーID一覧を取得
+    # 'messages' テーブルから、ログインユーザー（sender_id または receiver_id）が関わっている全てのメッセージを対象に、
+    # 相手側の user_id を特定します。自分自身へのメッセージは除外します
     c.execute('''
         SELECT DISTINCT
             CASE
@@ -549,12 +602,14 @@ def inbox():
           AND NOT (sender_id = ? AND receiver_id = ?)
     ''', (user_id, user_id, user_id, user_id, user_id, user_id))
 
+    
+    # 取得した相手のIDリストから重複を削除
+    # 複数回メッセージをやり取りした場合でも、相手のIDが重複しないようにセット型に変換し、再度リストに戻す
     other_user_ids = [row['other_user_id'] for row in c.fetchall()]
-
-    # 重複を削除（安全策）
     other_user_ids = list(set(other_user_ids))
 
-    # 相手のプロフィール情報を取得
+    # 各相手のプロフィール情報を取得
+    # 取得した相手のIDリストをループし、それぞれのユーザーのuser_id, username, display_nameを取得する
     conversations = []
     for other_id in other_user_ids:
         c.execute('SELECT user_id, username, display_name FROM users WHERE user_id = ?', (other_id,))
@@ -563,7 +618,10 @@ def inbox():
             conversations.append(user)
 
     conn.close()
+     # 受信箱のテンプレートをレンダリング
+    # 会話相手のリストを 'inbox.html' テンプレートに渡して表示
     return render_template('inbox.html', conversations=conversations)
+
 
 #通知機能
 @app.route('/notifications')
@@ -572,11 +630,16 @@ def notifications():
         return redirect(url_for('login'))
 
     conn = get_db_connection()
+
+    # ログインユーザー宛の通知を取得
+    # 'notifications' テーブルから、現在ログインしているユーザー宛ての通知を新しい順に取得
     notifs = conn.execute(
         "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC",
         (session['user_id'],)
     ).fetchall()
 
+    # 通知を「既読」に更新
+    # 取得した通知は全て読んだとみなし、'is_read' カラムを1（既読）に更新
     conn.execute(
         "UPDATE notifications SET is_read = 1 WHERE user_id = ?",
         (session['user_id'],)
@@ -584,6 +647,8 @@ def notifications():
     conn.commit()
     conn.close()
 
+    # 通知画面のテンプレートをレンダリング
+    # 取得した通知リストを 'notifications.html' テンプレートに渡して表示
     return render_template("notifications.html", notifications=notifs)
 
 
