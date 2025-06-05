@@ -18,6 +18,7 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+# 新規登録画面
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -46,6 +47,8 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
+
+#ログイン画面
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -64,6 +67,7 @@ def login():
     return render_template('login.html')
 
 
+# プロフィール画面
 @app.route('/profile')
 def profile():
     if 'user_id' not in session:
@@ -76,7 +80,7 @@ def profile():
     followers = conn.execute("SELECT COUNT(*) FROM follows WHERE followed_id = ?", (session['user_id'],)).fetchone()[0]
     following = conn.execute("SELECT COUNT(*) FROM follows WHERE follower_id = ?", (session['user_id'],)).fetchone()[0]
 
-    conn.close()  # ← すべてのクエリの後に閉じる！
+    conn.close()  
 
     return render_template('profile.html',
                            username=user['username'],
@@ -89,6 +93,7 @@ def profile():
                            following=following)
 
 
+#自分以外のユーザー プロフィール画面
 @app.route('/user/<int:user_id>', endpoint='user_profile')
 def user_profile(user_id):
     conn = get_db_connection()
@@ -127,6 +132,7 @@ def user_profile(user_id):
 
 
 
+#  プロフィール変更画面
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
     if 'user_id' not in session:
@@ -162,6 +168,7 @@ def edit_profile():
     conn.close()
     return render_template('edit_profile.html', user=user)
 
+# ポスト作成画面
 @app.route('/create_post', methods=['GET', 'POST'])
 def create_post():
          
@@ -191,6 +198,7 @@ def create_post():
 
     return render_template('create_post.html')
 
+#タイムライン画面
 @app.route('/timeline')
 def timeline():
     conn = get_db_connection()
@@ -231,12 +239,13 @@ def timeline():
                            comments_dict=comments_dict,
                            likes_dict=likes_dict,
                            liked_by_user=liked_by_user)
-
+#　ログアウト
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# ポスト削除
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
 def delete_post(post_id):
     if 'user_id' not in session:
@@ -250,7 +259,7 @@ def delete_post(post_id):
     return redirect(url_for('profile'))
 
 
-
+#　ポストへのコメント
 @app.route('/comment/<int:post_id>', methods=['POST'])
 def comment(post_id):
     if 'user_id' not in session:
@@ -294,7 +303,7 @@ def comment(post_id):
     conn.close()
     return redirect(request.referrer)
 
-
+# フォロー機能
 @app.route('/follow/<int:user_id>', methods=['POST'])
 def follow(user_id):
     if 'user_id' not in session:
@@ -339,7 +348,7 @@ def follow(user_id):
     conn.close()
     return redirect(request.referrer)
 
-
+#フォロー解除
 @app.route('/unfollow/<int:user_id>', methods=['POST'])
 def unfollow(user_id):
     if 'user_id' not in session:
@@ -352,6 +361,8 @@ def unfollow(user_id):
     flash("フォローを解除しました。")
     return redirect(request.referrer)
 
+
+#いいね機能
 @app.route('/like/<int:post_id>', methods=['POST'])
 def like(post_id):
     if 'user_id' not in session:
@@ -379,7 +390,7 @@ def like(post_id):
     return redirect(request.referrer)
 
 
-
+#いいね解除
 @app.route('/unlike/<int:post_id>', methods=['POST'])
 def unlike(post_id):
     if 'user_id' not in session:
@@ -391,6 +402,7 @@ def unlike(post_id):
     conn.close()
     return redirect(request.referrer)
 
+#DM送信画面
 @app.route('/message/<int:receiver_id>', methods=['GET', 'POST'])
 def message(receiver_id):
     if 'user_id' not in session:
@@ -420,6 +432,7 @@ def message(receiver_id):
 
     return render_template('message.html', messages=messages, receiver=receiver)
 
+#DM受信画面
 @app.route('/inbox')
 def inbox():
     if 'user_id' not in session:
@@ -457,7 +470,7 @@ def inbox():
     conn.close()
     return render_template('inbox.html', conversations=conversations)
 
-
+#通知機能
 @app.route('/notifications')
 def notifications():
     if 'user_id' not in session:
@@ -477,7 +490,6 @@ def notifications():
     conn.close()
 
     return render_template("notifications.html", notifications=notifs)
-
 
 
 
