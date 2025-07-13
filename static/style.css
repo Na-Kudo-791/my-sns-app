@@ -1,0 +1,147 @@
+:root {
+    --primary-color: #007bff;
+    --primary-hover-color: #0056b3;
+    --text-color: #333;
+    --light-gray-color: #f4f4f4;
+    --border-color: #ddd;
+    --white-color: #fff;
+    --danger-color: #dc3545;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    background-color: var(--light-gray-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* === ヘッダーとナビゲーション === */
+header {
+    background: var(--white-color);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+header h1 a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+header nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+}
+
+/* === メインコンテンツエリア === */
+main {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* === 投稿スタイル === */
+.post {
+    background: var(--white-color);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.post .profile-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.post .profile-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.post img.post-image {
+    max-width: 100%;
+    margin-top: 1rem;
+    border-radius: 8px;
+}
+
+/* === ボタンの共通スタイル === */
+button, input[type="submit"] {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+button:hover, input[type="submit"]:hover {
+    background-color: var(--primary-hover-color);
+}
+button.danger {
+    background-color: var(--danger-color);
+}
+
+/* いいねボタン */
+.like-toggle-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* === フォームのスタイル === */
+.form-container {
+    background: var(--white-color);
+    padding: 2rem;
+    border-radius: 8px;
+}
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="password"],
+.form-container textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-sizing: border-box; /* paddingを含めてwidth 100%にする */
+}
+
+/* === フラッシュメッセージ === */
+.flashes {
+    list-style: none;
+    padding: 0;
+}
+.flashes .info {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #e7f3fe;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+    border-radius: 5px;
+}
+.flashes .danger, .flashes .error {
+    background-color: #f2dede;
+    color: #a94442;
+    border-color: #ebccd1;
+}

@@ -3,52 +3,21 @@
 {% block title %}通知一覧{% endblock %}
 
 {% block content %}
-<style>
-    .notification-container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+<h2 class="mb-3">📩 通知一覧</h2>
 
-    .notification {
-        border-bottom: 1px solid #eee;
-        padding: 10px 0;
-    }
-
-    .notification:last-child {
-        border-bottom: none;
-    }
-
-    .notification-time {
-        color: #999;
-        font-size: 0.85em;
-    }
-
-    a.back-link {
-        display: inline-block;
-        margin-top: 20px;
-        text-decoration: none;
-        color: #007BFF;
-    }
-</style>
-
-<div class="notification-container">
-    <h2>📩 通知一覧</h2>
-
-    {% if notifications %}
-        {% for n in notifications %}
-            <div class="notification">
-                <p>{{ n['message'] }}</p>
-                <p class="notification-time">{{ n['created_at'] }}</p>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>通知はまだありません。</p>
-    {% endif %}
-
-    <a class="back-link" href="{{ url_for('profile') }}">← プロフィールに戻る</a>
-</div>
+{% if notifications %}
+    <div class="list-group">
+    {% for n in notifications %}
+        <div class="list-group-item {% if n['is_read'] == 0 %}list-group-item-light{% endif %}">
+            <p class="mb-1">{{ n['message'] }}</p>
+            <small class="text-muted">{{ n['created_at'] }}</small>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        通知はまだありません。
+    </div>
+{% endif %}
+<a href="{{ url_for('user.profile') }}" class="btn btn-link mt-3">← プロフィールに戻る</a>
 {% endblock %}

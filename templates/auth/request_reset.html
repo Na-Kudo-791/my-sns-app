@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}パスワードリセット{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">パスワードリセット</h2>
+                <p class="text-muted text-center">ご登録のメールアドレスを入力してください。パスワードリセット用のリンクをお送りします。</p>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">メールアドレス</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">送信</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

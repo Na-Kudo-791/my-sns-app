@@ -1,17 +1,20 @@
 {% extends "base.html" %}
+
+{% block title %}受信箱{% endblock %}
+
 {% block content %}
-<h2>受信箱</h2>
+<h2 class="mb-3">受信箱</h2>
 {% if conversations %}
-<ul>
-  {% for convo in conversations %}
-    <li>
-      <a href="{{ url_for('message', receiver_id=convo.user_id) }}">
-        {{ convo.display_name }}（@{{ convo.username }}）
-      </a>
-    </li>
-  {% endfor %}
-</ul>
+    <div class="list-group">
+    {% for convo in conversations %}
+        <a href="{{ url_for('main.message', receiver_id=convo.user_id) }}" class="list-group-item list-group-item-action">
+            {{ convo.display_name or convo.username }}
+        </a>
+    {% endfor %}
+    </div>
 {% else %}
-<p>まだやり取りのあるユーザーがいません。</p>
+    <div class="alert alert-info">
+        まだやり取りのあるユーザーがいません。
+    </div>
 {% endif %}
 {% endblock %}

@@ -1,20 +1,25 @@
 {% extends "base.html" %}
+
+{% block title %}{{ receiver.display_name or receiver.username }}さんとのメッセージ{% endblock %}
+
 {% block content %}
 <h2>
-  <a href="{{ url_for('user_profile', user_id=receiver.user_id) }}">
-    {{ receiver.display_name }}さん
-  </a>とのメッセージ
+    <a href="{{ url_for('user.user_profile', user_id=receiver.user_id) }}">
+        {{ receiver.display_name or receiver.username }}
+    </a>さんとのメッセージ
 </h2>
 
 <div>
     {% for msg in messages %}
-        <p><strong>{{ 'あなた' if msg.sender_id == session['user_id'] else receiver.display_name }}:</strong>
+        <p><strong>{{ 'あなた' if msg.sender_id == g.user.user_id else receiver.display_name }}:</strong>
         {{ msg.content }} <small>{{ msg.created_at }}</small></p>
     {% endfor %}
 </div>
+
 <form method="post">
     <textarea name="content" placeholder="メッセージを入力..." required></textarea><br>
     <button type="submit">送信</button>
 </form>
-<a href="{{ url_for('inbox') }}">← 受信箱に戻る</a>
+
+<a href="{{ url_for('main.inbox') }}">← 受信箱に戻る</a>
 {% endblock %}

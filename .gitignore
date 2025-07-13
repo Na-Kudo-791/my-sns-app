@@ -1,12 +1,73 @@
 # Python
+# -------------------------------------------------------------------
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 *.pyd
-dist/
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
 build/
-env/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python virtualenv
+# -------------------------------------------------------------------
 venv/
+.venv/
+env/
+.env/
+ENV/
+.ENV/
+
+# Flask
+# -------------------------------------------------------------------
+# Instance folder
+instance/
+.webassets-cache
+
+# Environment variables
+# -------------------------------------------------------------------
+# Keep secret keys, database passwords, etc. out of version control
 .env
-.DS_Store
+*.env
+
+# SQLite
+# -------------------------------------------------------------------
+# Database files
+*.sqlite
+*.sqlite3
+
+# IDE / Editor specific
+# -------------------------------------------------------------------
 .vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+# -------------------------------------------------------------------
+# macOS
+.DS_Store
+# Windows
+Thumbs.db

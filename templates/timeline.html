@@ -3,101 +3,62 @@
 {% block title %}タイムライン{% endblock %}
 
 {% block content %}
-<style>
-    .post {
-        background: white;
-        border: 1px solid #ccc;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-    }
-    .profile-info {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .profile-info img {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 10px;
-    }
-    .post img.post-image {
-        max-width: 100%;
-        margin-top: 10px;
-        border-radius: 8px;
-    }
-    .nav {
-        margin-bottom: 20px;
-    }
-    .nav a {
-        margin-right: 15px;
-        text-decoration: none;
-        color: #333;
-    }
-    .comments {
-        margin-top: 15px;
-        padding-left: 15px;
-        border-left: 2px solid #eee;
-    }
-    .comment-form {
-        margin-top: 10px;
-    }
-</style>
-
-<div class="nav">
-    <a href="{{ url_for('profile') }}">マイプロフィール</a>
-    <a href="{{ url_for('create_post') }}">投稿する</a>
-    <a href="{{ url_for('logout') }}">ログアウト</a>
-</div>
-
-<h1>タイムライン</h1>
+<h1 class="mb-4">タイムライン</h1>
 
 {% for post in posts %}
-    <div class="post">
-        <div class="profile-info">
-            {% if post['profile_image'] %}
-                <img src="{{ url_for('static', filename='uploads/' + post['profile_image']) }}" alt="プロフィール画像">
-            {% else %}
-                <img src="{{ url_for('static', filename='default_user.png') }}" alt="デフォルト画像">
-            {% endif %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                
+                {% if g.user and g.user.user_id == post.user_id %}
+                    <a href="{{ url_for('user.profile') }}" class="text-dark text-decoration-none">
+                        <strong>{{ post.username }}</strong>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('user.user_profile', user_id=post.user_id) }}" class="text-dark text-decoration-none">
+                        <strong>{{ post.username }}</strong>
+                    </a>
+                {% endif %}
+                </div>
 
-            {# ✅ 自分の投稿なら /profile、それ以外は /user/<user_id> にリンク #}
-            {% if session['user_id'] == post['user_id'] %}
-                <a href="{{ url_for('profile') }}"><strong>{{ post['username'] }}</strong></a>
-            {% else %}
-                <a href="{{ url_for('user_profile', user_id=post['user_id']) }}"><strong>{{ post['username'] }}</strong></a>
+            <p class="card-text">{{ post.content|linkify|safe }}</p>
+
+            {% if post.image %}
+                <img src="{{ url_for('static', filename='uploads/' ~ post.image) }}" class="img-fluid rounded" alt="投稿画像">
             {% endif %}
+            
+            <div class="like-section mt-3">
+                {% if g.user %}
+                    <button class="like-toggle-button btn btn-sm p-0"
+                            data-post-id="{{ post.id }}"
+                            data-liked="{{ 'true' if post.id in liked_posts else 'false' }}">
+                        {{ '❤️' if post.id in liked_posts else '🤍' }}
+                    </button>
+                    <span class="like-count" id="like-count-{{ post.id }}">{{ post.like_count }}</span>
+                {% else %}
+                    <span>🤍 {{ post.like_count }}</span>
+                {% endif %}
+            </div>
         </div>
 
-        <p>{{ post['content'] }}</p>
-        {% if post['image'] %}
-            <img class="post-image" src="{{ url_for('static', filename='uploads/' + post['image']) }}" alt="投稿画像">
-        {% endif %}
-
-        <!-- いいねボタン -->
-        <form action="{{ url_for('like', post_id=post['id']) }}" method="post" style="display:inline;">
-            {% if liked_by_user[post['id']] %}
-                <button type="submit">❤️ {{ likes_dict[post['id']] }}</button>
-            {% else %}
-                <button type="submit">🤍 {{ likes_dict[post['id']] }}</button>
+        <div class="card-footer bg-light">
+            {% if comments_dict[post.id] %}
+                <div class="comments mb-2">
+                {% for comment in comments_dict[post.id] %}
+                    <p class="mb-1"><small><strong>{{ comment.username }}:</strong> {{ comment.content }}</small></p>
+                {% endfor %}
+                </div>
             {% endif %}
-        </form>
 
-        <!-- コメント表示 -->
-        <div class="comments">
-            <h5>コメント一覧:</h5>
-            {% for comment in comments_dict[post['id']] %}
-                <p><strong>{{ comment['username'] }}:</strong> {{ comment['content'] }}</p>
-            {% endfor %}
+            {% if g.user %}
+            <form class="comment-form" method="post" action="{{ url_for('post.comment', post_id=post.id) }}">
+                <div class="input-group">
+                    <input type="text" name="comment" class="form-control form-control-sm" placeholder="コメントを追加..." required>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">送信</button>
+                </div>
+            </form>
+            {% endif %}
         </div>
-
-        <!-- コメント投稿フォーム -->
-        <form class="comment-form" method="post" action="{{ url_for('comment', post_id=post['id']) }}">
-            <input type="text" name="comment" placeholder="コメントを書く" required>
-            <button type="submit">送信</button>
-        </form>
     </div>
 {% endfor %}
 

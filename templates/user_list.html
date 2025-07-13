@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if list_type == 'following' %}
+        {{ user.username }}さんがフォロー中
+    {% else %}
+        {{ user.username }}さんのフォロワー
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h2>
+        {% if list_type == 'following' %}
+            {{ user.username }}さんがフォロー中
+        {% else %}
+            {{ user.username }}さんのフォロワー
+        {% endif %}
+    </h2>
+
+    {% if user_list %}
+        <ul>
+        {% for u in user_list %}
+            <li>
+                {% if g.user and g.user.user_id == u.user_id %}
+                    <a href="{{ url_for('user.profile') }}">
+                        {{ u.display_name or u.username }} (あなた)
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('user.user_profile', user_id=u.user_id) }}">
+                        {{ u.display_name or u.username }}
+                    </a>
+                {% endif %}
+                </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>
+            {% if list_type == 'following' %}
+                誰もフォローしていません。
+            {% else %}
+                フォロワーがいません。
+            {% endif %}
+        </p>
+    {% endif %}
+    <a href="{{ url_for('user.user_profile', user_id=user.user_id) }}">プロフィールに戻る</a>
+{% endblock %}

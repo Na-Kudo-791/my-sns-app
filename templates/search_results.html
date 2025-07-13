@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}「{{ query }}」の検索結果{% endblock %}
+
+{% block content %}
+    <h1>「{{ query }}」の検索結果</h1>
+
+    <hr>
+    <h2>ユーザー</h2>
+    {% if users %}
+        <ul>
+        {% for user in users %}
+            <li><a href="{{ url_for('user.user_profile', user_id=user.user_id) }}">{{ user.display_name or user.username }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>一致するユーザーは見つかりませんでした。</p>
+    {% endif %}
+
+    <hr>
+    <h2>投稿</h2>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post">
+                <p><strong>{{ post.username }}</strong>: {{ post.content|linkify|safe }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>一致する投稿は見つかりませんでした。</p>
+    {% endif %}
+
+{% endblock %}

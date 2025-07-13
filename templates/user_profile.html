@@ -1,67 +1,60 @@
 {% extends "base.html" %}
 
-{% block title %}{{ display_name }}さんのプロフィール{% endblock %}
+{% block title %}{{ user.display_name or user.username }}さんのプロフィール{% endblock %}
 
 {% block content %}
-<div class="profile-container">
-    <h1>{{ display_name }}（@{{ username }}）の<br>プロフィール</h1>
-
-
-    {% if profile_image %}
-        <img class="profile" src="{{ url_for('static', filename='uploads/' + profile_image) }}" alt="プロフィール画像">
-    {% endif %}
-
-    <p><strong>自己紹介：</strong> {{ bio }}</p>
-
-    <!-- フォロー/解除ボタン（自分以外のユーザーにのみ表示） -->
-    {% if session['user_id'] != user_id %}
-        {% if is_following %}
-            <form method="post" action="{{ url_for('unfollow', user_id=user_id) }}">
-                <button type="submit">フォロー解除</button>
-            </form>
-        {% else %}
-            <form method="post" action="{{ url_for('follow', user_id=user_id) }}">
-                <button type="submit">フォローする</button>
-            </form>
-        {% endif %}
-
-        <!-- ✅ DMボタン追加 -->
-        <a href="{{ url_for('message', receiver_id=user_id) }}" class="dm-button">このユーザーにDMを送る</a>
-    {% endif %}
-
-    <!-- フォロー数・フォロワー数 -->
-    <div class="follow-stats">
-        <p>フォロー中：{{ following }}人</p>
-        <p>フォロワー：{{ followers }}人</p>
-    </div>
-
-    <h2>投稿一覧</h2>
-    {% if posts %}
-        {% for post in posts %}
-            <div class="post">
-                {% if post['image'] %}
-                    <img src="{{ url_for('static', filename='uploads/' + post['image']) }}" alt="投稿画像">
+<div class="card mx-auto" style="max-width: 700px;">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <!-- プロフィール画像 -->
+            <div>
+                {% if user.profile_image %}
+                    <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" alt="プロフィール画像" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex justify-content-center align-items-center text-white" style="width: 100px; height: 100px;">
+                        <span>No Image</span>
+                    </div>
                 {% endif %}
-                <p>{{ post['content'] }}</p>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>投稿がまだありません。</p>
-    {% endif %}
+
+            <!-- ユーザー名とフォロー統計 -->
+            <div class="ms-4">
+                <h2 class="card-title mb-1">{{ user.display_name or user.username }}</h2>
+                <p class="text-muted">@{{ user.username }}</p>
+                
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('user.following', user_id=user.user_id) }}" class="text-decoration-none text-dark">
+                        <strong>{{ following }}</strong> フォロー中
+                    </a>
+                    <a href="{{ url_for('user.followers', user_id=user.user_id) }}" class="text-decoration-none text-dark">
+                        <strong>{{ followers }}</strong> フォロワー
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自己紹介 -->
+        <p class="mt-3">{{ user.bio or '自己紹介が設定されていません。' }}</p>
+
+        <!-- アクションボタン (フォロー/DM) -->
+        {% if g.user and not is_self %}
+        <div class="mt-3">
+            <button class="follow-toggle-button btn {% if is_following %}btn-outline-primary{% else %}btn-primary{% endif %}" 
+                    data-user-id="{{ user.user_id }}"
+                    data-following="{{ 'true' if is_following else 'false' }}">
+                {{ 'フォロー中' if is_following else 'フォローする' }}
+            </button>
+            <a href="{{ url_for('main.message', receiver_id=user.user_id) }}" class="btn btn-success">DMを送る</a>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
-<style>
-    .dm-button {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 10px 15px;
-        background-color: #28a745;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-    .dm-button:hover {
-        background-color: #218838;
-    }
-</style>
+<hr class="my-4">
+
+<h3 class="text-center mb-4">{{ user.username }}さんの投稿一覧</h3>
+
+<!-- 投稿一覧をここに表示 -->
+<!-- (例：timeline.htmlの投稿ループを参考に) -->
+
 {% endblock %}
