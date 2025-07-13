@@ -12,30 +12,19 @@ bp = Blueprint('main', __name__)
 @bp.route('/timeline')
 def timeline():
     """
-    タイムラインページを表示します。
-    ログインしている場合はフォロー中のユーザーと自分の投稿を、
-    未ログインの場合は全ユーザーの投稿を表示します。
+    タイムラインページ。全てのユーザーの投稿を新しい順に表示します。
     """
     db = get_db()
     
-    # ログイン状態に応じて表示する投稿を切り替える
-    if g.user:
-        # フォローしているユーザーと自分のuser_idを取得
-        posts = db.execute('''
-            SELECT p.id, p.content, p.image, p.created_at, p.user_id, u.username, u.display_name, u.profile_image,
-                   (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count
-            FROM posts p JOIN users u ON p.user_id = u.user_id
-            WHERE p.user_id IN (SELECT followed_id FROM follows WHERE follower_id = ?) OR p.user_id = ?
-            ORDER BY p.created_at DESC
-        ''', (g.user['user_id'], g.user['user_id'])).fetchall()
-    else:
-        # 全ての投稿を取得
-        posts = db.execute('''
-            SELECT p.id, p.content, p.image, p.created_at, p.user_id, u.username, u.display_name, u.profile_image,
-                   (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count
-            FROM posts p JOIN users u ON p.user_id = u.user_id
-            ORDER BY p.created_at DESC
-        ''').fetchall()
+    # ▼▼▼ 修正点 ▼▼▼
+    # ログイン状態にかかわらず、常に全ての投稿を取得するクエリに一本化します。
+    posts = db.execute('''
+        SELECT p.id, p.content, p.image, p.created_at, p.user_id, u.username, u.display_name, u.profile_image,
+               (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count
+        FROM posts p JOIN users u ON p.user_id = u.user_id
+        ORDER BY p.created_at DESC
+    ''').fetchall()
+    # ▲▲▲ 修正ここまで ▲▲▲
     
     # 各投稿に対するコメントを取得
     comments_dict = {}
@@ -55,7 +44,7 @@ def timeline():
 
     return render_template('timeline.html', posts=posts, liked_posts=liked_posts, comments_dict=comments_dict)
 
-# ダイレクトメッセージのルート
+# ダイレクトメッセージのルート (変更なし)
 @bp.route('/message/<int:receiver_id>', methods=['GET', 'POST'])
 @login_required
 def message(receiver_id):
@@ -82,7 +71,7 @@ def message(receiver_id):
 
     return render_template('message.html', messages=messages, receiver=receiver)
 
-# 受信箱のルート
+# 受信箱のルート (変更なし)
 @bp.route('/inbox')
 @login_required
 def inbox():
@@ -100,7 +89,7 @@ def inbox():
 
     return render_template('inbox.html', conversations=conversations)
 
-# 通知一覧のルート
+# 通知一覧のルート (変更なし)
 @bp.route('/notifications')
 @login_required
 def notifications():
@@ -117,7 +106,7 @@ def notifications():
 
     return render_template("notifications.html", notifications=notifs)
 
-# 検索機能のルート
+# 検索機能のルート (変更なし)
 @bp.route('/search')
 def search():
     """投稿とユーザーの検索機能"""
@@ -150,7 +139,7 @@ def search():
 
     return render_template('search_results.html', query=query, posts=found_posts, users=found_users)
 
-# ハッシュタグ検索のルート
+# ハッシュタグ検索のルート (変更なし)
 @bp.route('/hashtag/<string:tag_name>')
 def hashtag(tag_name):
     """ハッシュタグに関連する投稿を一覧表示する"""
