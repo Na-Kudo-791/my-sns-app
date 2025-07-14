@@ -1,132 +1,106 @@
-MySNS: 高機能なSNSアプリケーション
-FlaskとSQLiteをベースに構築した、多機能なSNS（ソーシャルネットワーキングサービス）のWebアプリケーションです。Pythonの学習成果として、スケーラブルな設計と実践的な機能実装を目指して開発しました。
+# MySNS: 高機能なSNSアプリケーション
 
-✨ 主な機能
-基本的なSNSの機能に加え、より高度で実用的な機能を実装しています。
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)  
+[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)  
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/index.html)  
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/ja/docs/Web/Guide/HTML/HTML5)  
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/ja/docs/Web/CSS)  
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/ja/docs/Web/JavaScript)
 
-1. 認証・アカウント管理
-安全なユーザー認証: 新規登録、ログイン、ログアウト機能。
+FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNSアプリケーションです。  
+認証・画像投稿・DM・通知・ハッシュタグ機能など、実際のサービスを意識した構成で、Python・Web開発の学習成果を形にしました。
 
-メールによる本人確認: 新規登録時に確認メールを送信し、不正なアカウント作成を防止します。
+---
 
-パスワードリセット: メール経由で安全にパスワードを再設定できます。
+## ✨ 主な機能
 
-プロフィール機能: 表示名、自己紹介、プロフィール画像を自由に設定・編集できます。
+### 1. アカウント管理
+- **ユーザー登録 / ログイン / ログアウト**
+- **メールによる本人確認（登録時）**
+- **パスワードリセット機能（メール連携）**
+- **プロフィール編集（表示名・自己紹介・画像）**
 
-2. 投稿とインタラクション
-投稿機能（画像対応）: テキストと画像を組み合わせた投稿が可能です。
+![プロフィール画面](static/images/profile.png)  
+![編集画面](static/images/edit_profile.png)
 
-非同期いいね・フォロー: JavaScript (Fetch API) を利用し、ページをリロードすることなく、スムーズないいね・フォロー操作を実現します。
+---
 
-コメント機能: 各投稿に対してコメントを投稿し、ユーザー間の対話を促進します。
+### 2. 投稿・インタラクション
+- **投稿機能（テキスト＋画像）**
+- **非同期「いいね」・フォロー（Fetch API使用）**
+- **コメント機能**
+- **投稿削除機能**
 
-投稿削除機能: 自分の投稿を安全に削除できます。
+![タイムライン](static/images/timeline.png)
 
-3. コミュニケーションと発見
-*ダイレクトメッセージ (DM): 他のユーザーと1対1でプライベートな会話ができます。
+---
 
-*通知機能: フォロー、いいね、コメントなどのアクティビティをリアルタイムでユーザーに知らせます。
+### 3. ユーザー間コミュニケーション
+- **ダイレクトメッセージ（DM）：1対1のプライベートチャット**
+- **リアルタイム通知（フォロー・いいね・コメント）**
+- **ハッシュタグ機能：#タグ自動リンク＋タグ一覧表示**
 
-*ハッシュタグ機能: 投稿内の #タグ を自動でリンク化し、同じハッシュタグを持つ投稿を一覧表示できます。
+---
+
+## 🛠 使用技術
+
+- **Python 3.x**：主要ロジック
+- **Flask**：軽量なWebフレームワーク
+- **SQLite3 + FTS5**：全文検索付きローカルDB
+- **HTML / CSS / JavaScript**：UI/UX構築
+- **Jinja2**：テンプレートエンジン
+- **Bootstrap 5**：フロントエンドデザイン
+- **Fetch API**：非同期通信
 
 
-🛠️ 技術スタックとアーキテクチャ
-バックエンド: Python 3.x, Flask
+---
 
-データベース: SQLite3 (開発用), 全文検索のためにFTS5拡張を利用
+## 🚀 セットアップ手順
 
-フロントエンド: HTML, CSS, JavaScript, Bootstrap 5
-
-テンプレートエンジン: Jinja2
-
-アーキテクチャ:
-
-srcレイアウト: プロジェクトソースコードと設定ファイルを分離し、見通しを良くしています。
-
-Blueprints: 機能ごと（認証、投稿、ユーザーなど）にコンポーネントを分割し、コードのモジュール性と再利用性を高めています。
-
-アプリケーションファクトリ: アプリケーションの生成と設定を関数内にカプセル化し、テストや複数環境への対応を容易にしています。
-
-📁 ディレクトリ構成
-保守性と拡張性を考慮したプロジェクト構造を採用しています。
-
-/my_sns_project/
-|
-|-- src/
-|   |-- my_sns_app/
-|   |   |-- __init__.py      # アプリケーションファクトリ
-|   |   |-- auth.py          # 認証ブループリント
-|   |   |-- user.py          # ユーザーブループリント
-|   |   |-- post.py          # 投稿ブループリント
-|   |   |-- main.py          # メインページブループリント
-|   |   |-- db.py            # データベース関連
-|   |   |-- schema.sql       # DBスキーマ定義
-|   |   `-- utils.py         # 補助関数
-|
-|-- templates/               # HTMLテンプレート
-|-- static/                  # CSS, JS, アップロード画像
-|-- venv/                    # Python仮想環境
-|
-|-- .env                     # 環境変数ファイル（※Git管理外）
-|-- .gitignore               # Git管理除外設定
-|-- pyproject.toml           # プロジェクト定義・依存関係
-`-- README.md
-
-🚀 セットアップ手順
-以下の手順で、ローカル環境にアプリケーションをセットアップして起動できます。
-
-リポジトリをクローン
-
+1.**リポジトリをクローン**
+```bash
 git clone https://github.com/your-username/my-sns-project.git
 cd my-sns-project
 
-仮想環境の作成と有効化
-
+2. **仮想環境の作成**
+```bash
 python -m venv venv
-# Windowsの場合
-.\venv\Scripts\activate
-# macOS / Linuxの場合
-source venv/bin/activate
+source venv/bin/activate  # Windowsなら .\venv\Scripts\activate
 
-依存ライブラリのインストール
-
+3. **依存ライブラリのインストール**
+```bash
 pip install -e .
-# または `pyproject.toml` に合わせて `pip install .` などを実行
 
-環境変数ファイル .env の作成
-プロジェクトルートに .env ファイルを新規作成し、以下の内容を記述します。特に SECRET_KEY とメール設定は必須です。
-
-# ターミナルで `python -c 'import secrets; print(secrets.token_hex())'` を実行して生成
-SECRET_KEY='あなたの生成した秘密鍵'
-
-# Gmailを使用する場合の例
+4. **.envの作成**
+```bash
+SECRET_KEY='your-generated-secret-key'
 MAIL_SERVER='smtp.gmail.com'
 MAIL_PORT=587
 MAIL_USE_TLS=True
-MAIL_USERNAME='あなたのGmailアドレス'
-MAIL_PASSWORD='あなたのGmailアプリパスワード'
+MAIL_USERNAME='your-email@gmail.com'
+MAIL_PASSWORD='your-app-password'
 
-データベースの初期化
-schema.sql に基づいてデータベースファイルを生成します。
-
+5. **データベースの初期化**
+```bash
 flask --app src/my_sns_app init-db
 
-アプリケーションの起動
-
+6. **アプリケーション起動**
+```bash
 flask --app src/my_sns_app run
 
-ブラウザでアクセス
-ブラウザで http://127.0.0.1:5000 にアクセスしてください。
 
-💡 今後の改善案
-このアプリケーションをさらに発展させるためのタスクリストです。
+7. **ブラウザでアクセス**
+```bash
+http://localhost:5000/
 
-フォローベースのタイムライン: 現在の「全体のタイムライン」に加え、フォローしているユーザーの投稿のみが表示されるタイムラインを実装する。
 
-セキュリティ強化 (CSRF対策): Flask-WTFを導入し、すべてのフォームにCSRF保護を追加して安全性を高める。
+💡 今後の展望 / 改善予定
+フォローベースのタイムライン表示
 
-ORMの導入: 生のSQL文をSQLAlchemyのようなORMに置き換え、コードの可読性・保守性・安全性を向上させる。
+CSRF対策の強化（Flask-WTF）
 
-テストコードの作成: pytestを使い、各機能が正しく動作することを保証する自動テストを記述する。
+SQLAlchemyによるORM化
 
-本番環境への準備: Gunicornなどの本番用サーバーへの移行や、Dockerを使ったコンテナ化を検討する。
+pytestによる自動テストの追加
+
+Gunicorn / Dockerでの本番環境構築
