@@ -1,13 +1,8 @@
-# MySNS: 高機能なSNSアプリケーション
+# MySNS: 簡易SNSアプリケーション
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)  
-[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)  
-[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/index.html)  
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/ja/docs/Web/Guide/HTML/HTML5)  
-[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/ja/docs/Web/CSS)  
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/ja/docs/Web/JavaScript)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)  [![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)  [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/index.html)  [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/ja/docs/Web/Guide/HTML/HTML5)  [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/ja/docs/Web/CSS)  [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/ja/docs/Web/JavaScript)
 
-FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNSアプリケーションです。  
+FlaskとSQLiteを使って構築した、簡易SNSアプリケーションです。  
 認証・画像投稿・DM・通知・ハッシュタグ機能など、実際のサービスを意識した構成で、Python・Web開発の学習成果を形にしました。
 
 ---
@@ -20,7 +15,13 @@ FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNS
 - **パスワードリセット機能（メール連携）**
 - **プロフィール編集（表示名・自己紹介・画像）**
 
-![プロフィール画面](images/profile.png)  
+新規登録画面
+![新規登録画面](images/register.png)
+ログイン画面
+![ログイン画面](images/login.png)
+プロフィール画面
+![プロフィール画面](images/profile.png) 
+プロフィール編集画面
 ![編集画面](images/edit_profile.png)
 
 ---
@@ -29,7 +30,8 @@ FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNS
 - **投稿機能（テキスト＋画像）**
 - **非同期「いいね」・フォロー（Fetch API使用）**
 - **コメント機能**
-
+- 
+タイムライン画面
 ![タイムライン](images/timeline.png)
 
 ---
@@ -38,6 +40,9 @@ FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNS
 - **ダイレクトメッセージ（DM）：1対1のプライベートチャット**
 - **リアルタイム通知（フォロー・いいね・コメント）**
 - **ハッシュタグ機能：#タグ自動リンク＋タグ一覧表示**
+
+ダイレクトメッセージ
+![DM画面](images/message.png)
 
 ---
 
@@ -103,3 +108,5 @@ SQLAlchemyによるORM化
 pytestによる自動テストの追加
 
 Gunicorn / Dockerでの本番環境構築
+
+削除機能エラーの改善
