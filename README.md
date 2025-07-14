@@ -20,8 +20,8 @@ FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNS
 - **パスワードリセット機能（メール連携）**
 - **プロフィール編集（表示名・自己紹介・画像）**
 
-![プロフィール画面](static/images/profile.png)  
-![編集画面](static/images/edit_profile.png)
+![プロフィール画面](images/profile.png)  
+![編集画面](images/edit_profile.png)
 
 ---
 
@@ -29,9 +29,8 @@ FlaskとSQLiteを使って構築した、多機能かつスケーラブルなSNS
 - **投稿機能（テキスト＋画像）**
 - **非同期「いいね」・フォロー（Fetch API使用）**
 - **コメント機能**
-- **投稿削除機能**
 
-![タイムライン](static/images/timeline.png)
+![タイムライン](images/timeline.png)
 
 ---
 
