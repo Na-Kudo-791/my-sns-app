@@ -24,7 +24,14 @@ def profile():
         (g.user['user_id'],)
     ).fetchall()
 
-    return render_template('profile.html', user=g.user, followers=followers_count, following=following_count, notifications=notifications)
+    # ▼▼▼ 修正点: 自分の投稿一覧を取得する処理を追加 ▼▼▼
+    posts = db.execute(
+        "SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC", (g.user['user_id'],)
+    ).fetchall()
+    # ▲▲▲ 修正ここまで ▲▲▲
+
+    # テンプレートに posts 変数を渡す
+    return render_template('profile.html', user=g.user, followers=followers_count, following=following_count, notifications=notifications, posts=posts)
 
 @bp.route('/user/<int:user_id>')
 def user_profile(user_id):
@@ -44,9 +51,17 @@ def user_profile(user_id):
             'SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?',
             (g.user['user_id'], user_id)
         ).fetchone() is not None
+    
+    # ▼▼▼ 修正点: 表示中ユーザーの投稿一覧を取得する処理を追加 ▼▼▼
+    posts = db.execute(
+        "SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC", (user_id,)
+    ).fetchall()
+    # ▲▲▲ 修正ここまで ▲▲▲
         
-    return render_template('user_profile.html', user=user, followers=followers_count, following=following_count, is_self=is_self, is_following=is_following)
+    # テンプレートに posts 変数を渡す
+    return render_template('user_profile.html', user=user, followers=followers_count, following=following_count, is_self=is_self, is_following=is_following, posts=posts)
 
+# edit_profile 関数 (変更なし)
 @bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
@@ -78,6 +93,7 @@ def edit_profile():
 
     return render_template('edit_profile.html', user=g.user)
 
+# follow / unfollow 関数 (変更なし)
 @bp.route('/follow/<int:user_id>', methods=['POST'])
 @login_required
 def follow(user_id):
@@ -101,6 +117,7 @@ def unfollow(user_id):
     followers_count = db.execute("SELECT COUNT(*) FROM follows WHERE followed_id = ?", (user_id,)).fetchone()[0]
     return jsonify({'status': 'success', 'following': False, 'followers_count': followers_count})
 
+# following / followers 関数 (変更なし)
 @bp.route('/user/<int:user_id>/following')
 def following(user_id):
     db = get_db()

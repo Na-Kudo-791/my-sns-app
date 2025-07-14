@@ -101,31 +101,23 @@ CREATE TABLE post_hashtags (
 );
 
 
--- ▼▼▼ 全文検索(FTS5)用の設定 (修正済み) ▼▼▼
+-- ▼▼▼ 全文検索(FTS5)用の設定 ▼▼▼
 
 -- 1. 全文検索用の仮想テーブルを作成
--- content列を検索対象とし、元の投稿IDをpost_idとして保持する
 CREATE VIRTUAL TABLE posts_fts USING fts5(
     content,
-    post_id UNINDEXED -- post_id列はインデックス化しない
+    post_id UNINDEXED
 );
 
 -- 2. postsテーブルとposts_ftsテーブルを同期させるためのトリガー
-
--- postsに新しい行が挿入されたら、posts_ftsにもデータを追加する
--- (修正点: posts.idをposts_fts.rowidにマッピング)
 CREATE TRIGGER posts_after_insert AFTER INSERT ON posts BEGIN
   INSERT INTO posts_fts(rowid, content, post_id) VALUES (new.id, new.content, new.id);
 END;
 
--- postsから行が削除されたら、posts_ftsからもデータを削除する
--- (修正点: FTS5の正しい削除構文に変更)
 CREATE TRIGGER posts_after_delete AFTER DELETE ON posts BEGIN
   INSERT INTO posts_fts(posts_fts, rowid, content, post_id) VALUES ('delete', old.id, old.content, old.id);
 END;
 
--- postsの行が更新されたら、posts_ftsのデータも更新する
--- (修正点: FTS5の正しい更新構文(delete & insert)に変更)
 CREATE TRIGGER posts_after_update AFTER UPDATE ON posts BEGIN
   INSERT INTO posts_fts(posts_fts, rowid, content, post_id) VALUES ('delete', old.id, old.content, old.id);
   INSERT INTO posts_fts(rowid, content, post_id) VALUES (new.id, new.content, new.id);

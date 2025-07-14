@@ -64,6 +64,30 @@
 </div>
 <hr class="my-4">
 
-<h3 class="text-center mb-4">あなたの投稿一覧</h3>
+<div class="mx-auto" style="max-width: 700px;">
+    <h3 class="text-center mb-4">あなたの投稿一覧</h3>
 
+    {% if posts %}
+        {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <p class="card-text mb-0"><small class="text-muted">{{ post.created_at.strftime('%Y年%m月%d日 %H:%M') }}</small></p>
+                    
+                    <form action="{{ url_for('post.delete_post', id=post.id) }}" method="POST" onsubmit="return confirm('本当にこの投稿を削除しますか？');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">削除</button>
+                    </form>
+                </div>
+                <hr>
+                <p class="card-text">{{ post.content | urlize }}</p>
+                {% if post.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + post.image) }}" class="img-fluid rounded">
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">まだ投稿がありません。</div>
+    {% endif %}
+</div>
 {% endblock %}

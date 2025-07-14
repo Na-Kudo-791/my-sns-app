@@ -1,18 +1,18 @@
-# src/my_sns_app/post.py
-
 import os
 import uuid
 import re
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, current_app, jsonify
 )
+# ▼▼▼ abortを追加 ▼▼▼
+from werkzeug.exceptions import abort
 from my_sns_app.db import get_db
 from my_sns_app.auth import login_required
 from my_sns_app.utils import allowed_file
 
 bp = Blueprint('post', __name__)
 
-# (create_post関数は変更なし)
+# create_post関数 (変更なし)
 @bp.route('/create_post', methods=['GET', 'POST'])
 @login_required
 def create_post():
@@ -58,9 +58,7 @@ def create_post():
     
     return render_template('create_post.html')
 
-
-# --- ▼▼▼ ここから修正 ▼▼▼ ---
-
+# like / unlike 関数 (変更なし)
 @bp.route('/like/<int:post_id>', methods=['POST'])
 @login_required
 def like(post_id):
@@ -83,8 +81,7 @@ def unlike(post_id):
 
     return jsonify({'status': 'success', 'liked': False, 'count': like_count})
 
-# --- ▲▲▲ ここまで修正 ▲▲▲ ---
-
+# comment 関数 (変更なし)
 @bp.route('/comment/<int:post_id>', methods=['POST'])
 @login_required
 def comment(post_id):
@@ -109,3 +106,27 @@ def comment(post_id):
 
     db.commit()
     return redirect(request.referrer or url_for('main.timeline'))
+
+# ▼▼▼ 修正点: 投稿削除機能を追加 ▼▼▼
+@bp.route('/<int:id>/delete', methods=('POST',))
+@login_required
+def delete_post(id):
+    """投稿を削除する"""
+    db = get_db()
+    
+    # 削除しようとしている投稿が、本当に自分のものかを確認
+    post = db.execute(
+        'SELECT * FROM posts WHERE id = ? AND user_id = ?', (id, g.user['user_id'])
+    ).fetchone()
+
+    if post is None:
+        # 投稿が存在しないか、他人の投稿を削除しようとした場合はエラー
+        abort(403)
+
+    # 投稿をデータベースから削除
+    db.execute('DELETE FROM posts WHERE id = ?', (id,))
+    db.commit()
+    
+    flash('投稿を削除しました。', 'success')
+    # 削除後はプロフィールページに戻る
+    return redirect(url_for('user.profile'))
